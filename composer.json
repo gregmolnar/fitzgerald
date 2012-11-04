@@ -1,0 +1,23 @@
+{
+    "name": "gregmolnar/fitzgerald",
+    "require": {
+        "php": ">=5.1.0",
+    }
+    "type": "micro-framework",
+    "description": "Fitzgerald is a tiny PHP framework that was inspired oh so heavily by the wondrous Sinatra of the Ruby world.",
+    "keywords": ["framework","micro-framework"],
+    "homepage": "http://gregmolnar.github.com/fitzgerald/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jim Benton",
+            "homepage": "http://autonomousmachine.com/",
+            "role": "Creator"
+        },
+        {
+            "name": "Greg Molnar",
+            "homepage": "http://gregmolnar.github.com/fitzgerald/",
+            "role": "Maintaner"
+        }
+    ],
+}
