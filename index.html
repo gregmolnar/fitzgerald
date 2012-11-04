@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Fitzgerald : A Tiny PHP framework inspired by Sinatra" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Fitzgerald</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/gregmolnar/fitzgerald">View on GitHub</a>
+
+          <h1 id="project_title">Fitzgerald</h1>
+          <h2 id="project_tagline">A Tiny PHP framework inspired by Sinatra</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/gregmolnar/fitzgerald/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/gregmolnar/fitzgerald/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Welcome to Fitzgerald.</h3>
+
+<p>Fitzgerald is a tiny PHP framework that was inspired oh so heavily by the wondrous Sinatra of the Ruby world.</p>
+
+<h3>Getting started</h3>
+
+<p>Copy the lib folder from the repo to your working directory. Create a file for your application for instance app.php. Inside this file include fitzgerald and subclass it:</p>
+
+<div class="highlight"><pre><span class="k">include</span><span class="p">(</span><span class="s1">'lib/fitzgerald.php'</span><span class="p">);</span>
+
+<span class="k">class</span> <span class="nc">MyApplication</span> <span class="k">extends</span> <span class="nx">Fitzgerald</span> <span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Create an index.php in you DOCUMENT_ROOT and include your app:</p>
+
+<div class="highlight"><pre><span class="k">include</span><span class="p">(</span><span class="s1">'../app.php'</span><span class="p">);</span>
+</pre></div>
+
+<p>Create a .htaccess file with the following contents:</p>
+
+<pre><code>RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</code></pre>
+
+<p>In your app.php file create an instance of the subclacc you made. Add an action to the class and setup a route, than call the run() method of fitzgerald:</p>
+
+<div class="highlight"><pre><span class="k">include</span><span class="p">(</span><span class="s1">'lib/fitzgerald.php'</span><span class="p">);</span>
+
+<span class="k">class</span> <span class="nc">MyApplication</span> <span class="k">extends</span> <span class="nx">Fitzgerald</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">get_index</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'index'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyApplication</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'layout'</span> <span class="o">=&gt;</span> <span class="s1">'mylayout'</span><span class="p">));</span>
+<span class="c1">// index action</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="s1">'get_index'</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
+
+<p>Create a layout and a view in the views folder and open the domain in a browser. You should see the contents of the index view.</p>
+
+<p>To pass data to a view you need to pass it to the render function:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyApplication</span> <span class="k">extends</span> <span class="nx">Fitzgerald</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">get_index</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">'index'</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'data'</span> <span class="o">=&gt;</span> <span class="s1">'my test data'</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>Authors and Contributors</h3>
+
+<p>Fitzgerald built by Jim Benton(<a href="https://github.com/jim" class="user-mention">@jim</a>).</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Fitzgerald maintained by <a href="https://github.com/gregmolnar">gregmolnar</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
