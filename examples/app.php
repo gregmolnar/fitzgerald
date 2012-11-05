@@ -1,7 +1,7 @@
 <?php
     // See the accompanying README for how to use Fitzgerald!
 
-    include('lib/fitzgerald.php');
+    include('../lib/fitzgerald.php');
 
     class Application extends Fitzgerald {
         // Define your controller methods, remembering to return a value for the browser!
