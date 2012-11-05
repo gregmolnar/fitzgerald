@@ -93,14 +93,12 @@
     }
 
     class SessionWrapper {
-        public function setFlash($msg, $status = 'none') {
-            global $_SESSION;
+        public function setFlash($msg, $status = 'none') {            
             $_SESSION['flash_msg'] = $msg;
             $_SESSION['flash_status'] = $status;
         }
 
         public function getFlash() {
-            global $_SESSION;
             $msg = '';
 
             if (isset($_SESSION['flash_msg'])) {
@@ -113,12 +111,10 @@
         }
 
         public function hasFlash() {
-            global $_SESSION;
             return isset($_SESSION['flash_msg']);
         }
 
         public function flashStatus() {
-            global $_SESSION;
             $status = 'undefined';
 
             if (isset($_SESSION['flash_status'])) {
@@ -130,29 +126,25 @@
         }
 
         public function __get($key) {
-            global $_SESSION;
             return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
         }
 
         public function __set($key, $value) {
-            global $_SESSION;
             $_SESSION[$key] = $value;
             return $value;
         }
 		
-	public function __isset($key){
-		return isset($_SESSION[$key]);
-	}
+    	public function __isset($key){
+    		return isset($_SESSION[$key]);
+    	}
     }
 
     class RequestWrapper {
         public function __get($key) {
-            global $_REQUEST;
             return isset($_REQUEST[$key]) ? $_REQUEST[$key] : null;
         }
 
         public function __set($key, $value) {
-            global $_REQUEST;
             $_REQUEST[$key] = $value;
             return $value;
         }
