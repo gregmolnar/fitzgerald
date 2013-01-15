@@ -6,23 +6,8 @@
 
     /*  Fitzgerald - a single file PHP framework
      *  (c) 2010 Jim Benton and contributors, released under the MIT license
-     *  Version 0.4
+     *  Version 0.5
      */
-
-    class Template {
-        private $fileName;
-        private $root;
-        public function __construct($root, $fileName) {
-            $this->fileName = $fileName;
-            $this->root = $root;
-        }
-        public function render($locals) {
-            extract($locals);
-            ob_start();
-            include(realpath($this->root . 'views/' . $this->fileName . '.php'));
-            return ob_get_clean();
-        }
-    }
 
     class Url {
         private $url;
@@ -265,14 +250,19 @@
             }
 
             if (is_string($this->options->layout)) {
-                $contentTemplate = new Template($this->root(), $fileName);              // create content template
-                $variableArray['content'] = $contentTemplate->render($variableArray);   // render and store contet
-                $layoutTemplate = new Template($this->root(), $this->options->layout);  // create layout template
-                return $layoutTemplate->render($variableArray);                         // render layout template and return
+                $variableArray['content'] = $this->renderTemplate($fileName, $variableArray);
+                return $this->renderTemplate($this->options->layout, $variableArray);
             } else {
-                $template = new Template($this->root(), $fileName);                     // create template
-                return $template->render($variableArray);                               // render template and return
+                return $this->renderTemplate($fileName, $variableArray);
             }
+        }
+
+        protected function renderTemplate($fileName, $locals = array())
+        {  
+            extract($locals);
+            ob_start();            
+            include(realpath($this->root() . 'views/' . $fileName . '.php'));
+            return ob_get_clean();
         }
 
         protected function sendFile($filename, $contentType, $path) {
