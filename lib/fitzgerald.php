@@ -265,6 +265,11 @@
             return ob_get_clean();
         }
 
+        protected function renderPartial($fileName, $locals = array())
+        {
+            echo  $this->renderTemplate($fileName, $locals);
+        }
+        
         protected function sendFile($filename, $contentType, $path) {
             header("Content-type: $contentType");
             header("Content-Disposition: attachment; filename=$filename");
