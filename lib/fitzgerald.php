@@ -57,9 +57,11 @@
 
     class ArrayWrapper {
         private $subject;
+
         public function __construct(&$subject) {
             $this->subject = $subject;
         }
+
         public function __get($key) {
             return isset($this->subject[$key]) ? $this->subject[$key] : null;
         }
@@ -69,16 +71,17 @@
             return $value;
         }
 
-		public function __isset($key){
-			return isset($this->subject[$key]) && ( is_array($this->subject[$key]) || strlen($this->subject[$key]) > 0  );
-		}
-		public function getCount(){
-			return count($this->subject);
-		}
+        public function __isset($key){
+            return isset($this->subject[$key]) && ( is_array($this->subject[$key]) || strlen($this->subject[$key]) > 0  );
+        }
+
+        public function getCount(){
+            return count($this->subject);
+        }
     }
 
     class SessionWrapper {
-        public function setFlash($msg, $status = 'none') {            
+        public function setFlash($msg, $status = 'none') {
             $_SESSION['flash_msg'] = $msg;
             $_SESSION['flash_status'] = $status;
         }
@@ -118,10 +121,10 @@
             $_SESSION[$key] = $value;
             return $value;
         }
-		
-    	public function __isset($key){
-    		return isset($_SESSION[$key]);
-    	}
+
+        public function __isset($key){
+            return isset($_SESSION[$key]);
+        }
     }
 
     class RequestWrapper {
@@ -133,13 +136,14 @@
             $_REQUEST[$key] = $value;
             return $value;
         }
-		
-		public function __isset($key){
-			return isset($_REQUEST[$key]);
-		}
-		public function getCount(){
-			return count($_REQUEST);
-		}
+
+        public function __isset($key){
+            return isset($_REQUEST[$key]);
+        }
+
+        public function getCount(){
+            return count($_REQUEST);
+        }
     }
 
     class Fitzgerald {
@@ -258,9 +262,9 @@
         }
 
         protected function renderTemplate($fileName, $locals = array())
-        {  
+        {
             extract($locals);
-            ob_start();            
+            ob_start();
             include(realpath($this->root() . 'views/' . $fileName . '.php'));
             return ob_get_clean();
         }
@@ -269,7 +273,7 @@
         {
             echo  $this->renderTemplate($fileName, $locals);
         }
-        
+
         protected function sendFile($filename, $contentType, $path) {
             header("Content-type: $contentType");
             header("Content-Disposition: attachment; filename=$filename");
