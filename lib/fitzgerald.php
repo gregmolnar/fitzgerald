@@ -20,7 +20,15 @@
         public function __construct($httpMethod, $url, $conditions=array(), $mountPoint) {
 
             $requestMethod = $_SERVER['REQUEST_METHOD'];
-            $requestUri = str_replace($mountPoint, '', preg_replace('/\?.+/', '', $_SERVER['REQUEST_URI']));
+
+            $requestUri = preg_replace('/\?.+/', '', $_SERVER['REQUEST_URI']);
+            $requestUri = str_replace($mountPoint, '', $requestUri);
+
+            // This two URL: /example /example/ should be identical
+            $requestUri = rtrim($requestUri, '/');
+            if( empty($requestUri) ) {
+                $requestUri = '/';
+            }
 
             $this->url = $url;
             $this->method = $httpMethod;
