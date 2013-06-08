@@ -21,7 +21,12 @@
 
             $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-            $requestUri = preg_replace('/\?.+/', '', $_SERVER['REQUEST_URI']);
+            // This two URL: /index.php/example /example should be identical
+            $requestUri = array_key_exists('PATH_INFO', $_SERVER)
+                ? $_SERVER['PATH_INFO']
+                : $_SERVER['REQUEST_URI'];
+
+            $requestUri = preg_replace('/\?.+/', '', $requestUri);
             $requestUri = str_replace($mountPoint, '', $requestUri);
 
             // This two URL: /example /example/ should be identical
