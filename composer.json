@@ -1,0 +1,22 @@
+{
+    "name": "gregmolnar/fitzgerald",
+    "version": "1.0.0-beta1",
+    "require": {
+        "php": ">=5.3"
+    },
+    "authors": [
+        {
+            "name": "Greg Molnar",
+            "email": "molnargerg@gmail.com"
+        }
+    ],
+     "require": {
+        "katzgrau/klogger": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "GregMolnar\\Fitzgerald\\": "src/"
+        },
+        "classmap": ["src/"]
+    }
+}
