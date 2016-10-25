@@ -168,10 +168,20 @@ class Fitzgerald {
         die();
     }
 
-    public function show404() {
-        header("HTTP/1.0 404 Not Found");
-        echo $this->render('404');
+    public function handleError($number, $message, $file, $line) {
+        $number = (is_integer($number)) ? $number : 500;
+        $this->logger->error("{$this->class}: {$message} on {$file}:{$line}");
+        header("HTTP/1.0 $number Server Error");
+
+        if (!$this->viewExists('500')) {
+            echo '<h2>Server Error</h2>';
+            echo $message.' on '.$file.':'.$line;
+        } else {
+            echo $this->render('500', compact('message', 'file', 'line'));
+        }
+
         die();
+        exit;
     }
 
     public function get($url, $methodName, $conditions = array()) {
@@ -274,12 +284,17 @@ class Fitzgerald {
     protected function renderTemplate($fileName, $locals = array())
     {
         extract($locals);
-        ob_start();
-        $this->logger->info("{$this->class}: Rendering file: ".$this->root() . 'views/' . $fileName . ".php");
-        if(!$path = realpath($this->root() . 'views/' . $fileName . '.php')){
-            $path = realpath($this->app_root . '/themes/default/views/' . $fileName . '.php');
+        $view = $this->root() . 'views/' . $fileName . '.php';
+
+        if (!$this->viewExists($fileName)) {
+            $message = "View not exists: ".$view;
+            return $this->handleError(500, $message, __FILE__, __LINE__);
         }
-        include($path);
+
+        $this->logger->info("{$this->class}: Rendering file: ".$view);
+
+        ob_start();
+        include(realpath($view));
         return ob_get_clean();
     }
 
@@ -377,5 +392,10 @@ class Fitzgerald {
         }
 
         return $this->show404();
+    }
+
+    private function viewExists($file)
+    {
+        return file_exists(realpath($this->root() . 'views/' . $file . '.php'));
     }
 }
