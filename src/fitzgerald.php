@@ -162,10 +162,16 @@ class Fitzgerald {
         set_error_handler(array($this, 'handleError'), 2);
     }
 
-    public function handleError($number, $message, $file, $line) {
-        header("HTTP/1.0 500 Server Error");
-        echo $this->render('500', compact('number', 'message', 'file', 'line'));
-        die();
+    public function show404()
+    {
+        header("HTTP/1.0 404 Not Found");
+
+        if (!$this->viewExists('404')) {
+            die('Page does not exists');
+            exit;
+        }
+
+        echo $this->render('404');
     }
 
     public function handleError($number, $message, $file, $line) {
