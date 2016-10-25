@@ -164,26 +164,25 @@ class Fitzgerald {
 
     public function show404()
     {
-        header("HTTP/1.0 404 Not Found");
-
-        if (!$this->viewExists('404')) {
-            die('Page does not exists');
-            exit;
-        }
-
-        echo $this->render('404');
+        return $this->handleError(404);
     }
 
-    public function handleError($number, $message, $file, $line) {
+    public function handleError($number, $message = '', $file = '', $line = '', $header = 'Server Error') {
         $number = (is_integer($number)) ? $number : 500;
-        $this->logger->error("{$this->class}: {$message} on {$file}:{$line}");
-        header("HTTP/1.0 $number Server Error");
+        $header = ($number == 404) ? 'Not Found':$header;
 
-        if (!$this->viewExists('500')) {
-            echo '<h2>Server Error</h2>';
-            echo $message.' on '.$file.':'.$line;
+        if (!empty($line) && !empty($file)) {
+            $message = "$message on $file:$line";
+        }
+
+        $this->logger->error("{$this->class}: $message");
+        header("HTTP/1.0 $number $header");
+
+        if (!$this->viewExists($number)) {
+            echo "<h2>$header</h2>";
+            echo $message;
         } else {
-            echo $this->render('500', compact('message', 'file', 'line'));
+            echo $this->render($number, compact('message', 'file', 'line'));
         }
 
         die();
