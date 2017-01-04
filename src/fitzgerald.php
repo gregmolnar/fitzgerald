@@ -20,6 +20,12 @@ class Url {
 
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         $requestUri = str_replace($mountPoint, '', preg_replace('/\?.+/', '', $_SERVER['REQUEST_URI']));
+        $requestUri = preg_replace('#/+#', '/', $requestUri);
+        $requestUri = rtrim($requestUri, '/');
+
+        if( empty($requestUri) ) {
+            $requestUri = '/';
+        }
         $this->url = $url;
         $this->method = $httpMethod;
         $this->conditions = $conditions;
