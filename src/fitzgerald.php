@@ -221,9 +221,16 @@ class Fitzgerald {
 
     protected function run_filter($arr_filter, $methodName) {
         $this->logger->info("{$this->class}: Running filters", array('filters' => $arr_filter, 'method' => $methodName));
-        if(isset($arr_filter[$methodName])) {
-            for ($i=0; $i < count($arr_filter[$methodName]); $i++) {
-                $return = call_user_func(array($this, $arr_filter[$methodName][$i]));
+        $filters = false;
+        if(isset($arr_filter['*'])){
+            $filters = $arr_filter['*'];
+        }elseif(isset($arr_filter[$methodName])){
+            $filters = $arr_filter[$methodName];
+        }
+        $this->logger->info("Applying filters", array('filters' => $filters));
+        if($filters) {
+            for ($i=0; $i < count($filters); $i++) {
+                $return = call_user_func(array($this, $filters[$i]));
 
                 if(!is_null($return)) {
                     return $return;
