@@ -19,17 +19,7 @@ class Url {
     public function __construct($httpMethod, $url, $conditions=array(), $mountPoint, $logger) {
 
         $requestMethod = $_SERVER['REQUEST_METHOD'];
-
-        // This two URL: /index.php/example /example should be identical
-        $requestUri = array_key_exists('PATH_INFO', $_SERVER) ? $_SERVER['PATH_INFO'] : $_SERVER['REQUEST_URI'];
-        $requestUri = preg_replace('/\?.+/', '', $requestUri);
-        $requestUri = str_replace($mountPoint, '', $requestUri);
-        // This two URL: /example /example/ should be identical
-        $requestUri = rtrim($requestUri, '/');
-        if( empty($requestUri) ) {
-            $requestUri = '/';
-        }
-
+        $requestUri = str_replace($mountPoint, '', preg_replace('/\?.+/', '', $_SERVER['REQUEST_URI']));
         $this->url = $url;
         $this->method = $httpMethod;
         $this->conditions = $conditions;
@@ -72,10 +62,12 @@ class ArrayWrapper {
     public function __get($key) {
         return isset($this->subject[$key]) ? $this->subject[$key] : null;
     }
+
     public function __set($key, $value) {
         $this->subject[$key] = $value;
         return $value;
     }
+
     public function __isset($key){
         return isset($this->subject[$key]) && ( is_array($this->subject[$key]) || strlen($this->subject[$key]) > 0  );
     }
@@ -89,33 +81,43 @@ class SessionWrapper {
         $_SESSION['flash_msg'] = $msg;
         $_SESSION['flash_status'] = $status;
     }
+
     public function getFlash() {
         $msg = '';
+
         if (isset($_SESSION['flash_msg'])) {
             $msg = $_SESSION['flash_msg'];
             unset($_SESSION['flash_msg']);
             unset($_SESSION['flash_status']);
         }
+
         return $msg;
     }
+
     public function hasFlash() {
         return isset($_SESSION['flash_msg']);
     }
+
     public function flashStatus() {
         $status = 'undefined';
+
         if (isset($_SESSION['flash_status'])) {
           $status = $_SESSION['flash_status'];
           // it's unset at getFlash as it's related to the flash itself
         }
+
         return $status;
     }
+
     public function __get($key) {
         return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
     }
+
     public function __set($key, $value) {
         $_SESSION[$key] = $value;
         return $value;
     }
+
     public function __isset($key){
         return isset($_SESSION[$key]);
     }
@@ -154,7 +156,8 @@ class Fitzgerald {
         $this->logger->info("Initialisation {$this->class}");
         $this->logger->info("Processing request {$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']}");
         $this->options = new ArrayWrapper($options);
-
+        // if(!file_exists(realpath($this->root() . 'views/' . $this->options->layout . '.php')))
+        //     $this->options->layout = $app_root.'themes/default/views/layouts/application.php';
         session_name('fitzgerald_session');
         @session_start();
         $this->session = new SessionWrapper;
@@ -217,6 +220,7 @@ class Fitzgerald {
     }
 
     protected function run_filter($arr_filter, $methodName) {
+        $this->logger->info("{$this->class}: Running filters", array('filters' => $arr_filter, 'method' => $methodName));
         if(isset($arr_filter[$methodName])) {
             for ($i=0; $i < count($arr_filter[$methodName]); $i++) {
                 $return = call_user_func(array($this, $arr_filter[$methodName][$i]));
@@ -235,14 +239,14 @@ class Fitzgerald {
     protected function redirect($path) {
         $protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
         $host = (preg_match('%^http://|https://%', $path) > 0) ? '' : "$protocol://" . $_SERVER['HTTP_HOST'];
-        $uri = is_string($this->options->mountPoint) ? $this->options->mountPoint : '';
         if (!empty($this->error)) {
           $this->session->error = $this->error;
         }
         if (!empty($this->success)) {
           $this->session->success = $this->success;
         }
-        header("Location: $host$uri$path");
+        $this->logger->info("Redirecting to: $host$uri$path");
+        header("Location: $host$path");
         return false;
     }
 
@@ -294,7 +298,6 @@ class Fitzgerald {
         return readfile($path);
     }
 
-
     protected function sendDownload($filename, $path) {
         header("Content-Type: application/force-download");
         header("Content-Type: application/octet-stream");
@@ -306,20 +309,25 @@ class Fitzgerald {
     }
 
     protected function execute($methodName, $params) {
+        $this->logger->info("{$this->class}: Executing method: {$methodName}");
         $return = $this->run_filter($this->before_filters, $methodName);
         if (!is_null($return)) {
           return $return;
         }
+
         if ($this->session->error) {
             $this->error = $this->session->error;
             $this->session->error = null;
         }
+
         if ($this->session->success) {
             $this->success = $this->session->success;
             $this->session->success = null;
         }
+
         $reflection = new ReflectionMethod(get_class($this), $methodName);
         $args = array();
+
         foreach($reflection->getParameters() as $param) {
             if(isset($params[$param->name])) {
                 $args[$param->name] = $params[$param->name];
@@ -328,11 +336,14 @@ class Fitzgerald {
                 $args[$param->name] = $param->getDefaultValue();
             }
         }
+
         $response = $reflection->invokeArgs($this, $args);
+
         $return = $this->run_filter($this->after_filters, $methodName);
         if (!is_null($return)) {
           return $return;
         }
+
         return $response;
     }
 
