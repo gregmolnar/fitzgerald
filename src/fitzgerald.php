@@ -171,16 +171,31 @@ class Fitzgerald {
         set_error_handler(array($this, 'handleError'), 2);
     }
 
-    public function handleError($number, $message, $file, $line) {
-        header("HTTP/1.0 500 Server Error");
-        echo $this->render('500', compact('number', 'message', 'file', 'line'));
-        die();
+    public function show404()
+    {
+        return $this->handleError(404);
     }
 
-    public function show404() {
-        header("HTTP/1.0 404 Not Found");
-        echo $this->render('404');
+    public function handleError($number, $message = '', $file = '', $line = '', $header = 'Server Error') {
+        $number = (is_integer($number)) ? $number : 500;
+        $header = ($number == 404) ? 'Not Found':$header;
+
+        if (!empty($line) && !empty($file)) {
+            $message = "$message on $file:$line";
+        }
+
+        $this->logger->error("{$this->class}: $message");
+        header("HTTP/1.0 $number $header");
+
+        if (!$this->viewExists($number)) {
+            echo "<h2>$header</h2>";
+            echo $message;
+        } else {
+            echo $this->render($number, compact('message', 'file', 'line'));
+        }
+
         die();
+        exit;
     }
 
     public function get($url, $methodName, $conditions = array()) {
@@ -291,12 +306,17 @@ class Fitzgerald {
     protected function renderTemplate($fileName, $locals = array())
     {
         extract($locals);
-        ob_start();
-        $this->logger->info("{$this->class}: Rendering file: ".$this->root() . 'views/' . $fileName . ".php");
-        if(!$path = realpath($this->root() . 'views/' . $fileName . '.php')){
-            $path = realpath($this->app_root . '/themes/default/views/' . $fileName . '.php');
+        $view = $this->root() . 'views/' . $fileName . '.php';
+
+        if (!$this->viewExists($fileName)) {
+            $message = "View not exists: ".$view;
+            return $this->handleError(500, $message, __FILE__, __LINE__);
         }
-        include($path);
+
+        $this->logger->info("{$this->class}: Rendering file: ".$view);
+
+        ob_start();
+        include(realpath($view));
         return ob_get_clean();
     }
 
@@ -401,5 +421,10 @@ class Fitzgerald {
         }
 
         return $this->show404();
+    }
+
+    private function viewExists($file)
+    {
+        return file_exists(realpath($this->root() . 'views/' . $file . '.php'));
     }
 }
